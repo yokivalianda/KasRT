@@ -175,6 +175,46 @@ export async function buatTagihan(fd: FormData) {
     return { ok: true }
   } catch (e: any) { return { error: e.message } }
 }
+export async function tutupTagihan(billId: string) {
+  try {
+    const { error } = await sb()
+      .from('bills')
+      .update({ status: 'tutup' })
+      .eq('id', billId)
+    if (error) return { error: error.message }
+    revalidatePath('/warga')
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: any) { return { error: e.message } }
+}
+
+export async function bukaTagihan(billId: string) {
+  try {
+    const { error } = await sb()
+      .from('bills')
+      .update({ status: 'buka' })
+      .eq('id', billId)
+    if (error) return { error: error.message }
+    revalidatePath('/warga')
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: any) { return { error: e.message } }
+}
+
+export async function hapusTagihan(billId: string) {
+  try {
+    // bill_payments akan terhapus otomatis (CASCADE)
+    const { error } = await sb()
+      .from('bills')
+      .delete()
+      .eq('id', billId)
+    if (error) return { error: error.message }
+    revalidatePath('/warga')
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: any) { return { error: e.message } }
+}
+
 
 export async function tandaiLunas(paymentId: string, metode: string) {
   try {
