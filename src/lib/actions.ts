@@ -371,3 +371,32 @@ export async function hapusPengumuman(id: string) {
     return { ok: true }
   } catch (e: any) { return { error: e.message } }
 }
+
+// ─── SETTINGS / RT ───────────────────────────────────────────
+export async function editRT(fd: FormData) {
+  try {
+    const supabase = sb()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return { error: 'Tidak ada sesi' }
+
+    const nama = (fd.get('nama') as string).trim()
+    if (!nama) return { error: 'Nama RT tidak boleh kosong' }
+
+    const { error } = await supabase
+      .from('neighborhoods')
+      .update({
+        nama,
+        rw:        fd.get('rw') as string || null,
+        kelurahan: fd.get('kelurahan') as string || null,
+        kecamatan: fd.get('kecamatan') as string || null,
+        kota:      fd.get('kota') as string || null,
+        provinsi:  fd.get('provinsi') as string || null,
+      })
+      .eq('owner_id', session.user.id)
+
+    if (error) return { error: error.message }
+    revalidatePath('/settings')
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: any) { return { error: e.message } }
+}
