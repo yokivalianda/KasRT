@@ -69,6 +69,36 @@ export async function hapusWarga(memberId: string) {
     return { ok: true }
   } catch (e: any) { return { error: e.message } }
 }
+export async function editWarga(memberId: string, fd: FormData) {
+  try {
+    const { error } = await sb()
+      .from('members')
+      .update({
+        nama:        fd.get('nama') as string,
+        no_rumah:    fd.get('no_rumah') as string || null,
+        jumlah_jiwa: parseInt(fd.get('jumlah_jiwa') as string) || 1,
+        no_hp:       fd.get('no_hp') as string || null,
+        alamat:      fd.get('alamat') as string || null,
+      })
+      .eq('id', memberId)
+    if (error) return { error: error.message }
+    revalidatePath('/warga')
+    return { ok: true }
+  } catch (e: any) { return { error: e.message } }
+}
+
+export async function tandaiPindah(memberId: string) {
+  try {
+    const { error } = await sb()
+      .from('members')
+      .update({ status: 'pindah' })
+      .eq('id', memberId)
+    if (error) return { error: error.message }
+    revalidatePath('/warga')
+    return { ok: true }
+  } catch (e: any) { return { error: e.message } }
+}
+
 
 // ─── KAS ─────────────────────────────────────────────────────
 export async function tambahTransaksi(fd: FormData) {
