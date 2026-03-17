@@ -132,6 +132,27 @@ export async function hapusTransaksi(id: string) {
     return { ok: true }
   } catch (e: any) { return { error: e.message } }
 }
+export async function editTransaksi(id: string, fd: FormData) {
+  try {
+    const jumlah = parseInt((fd.get('jumlah') as string).replace(/\D/g,''))
+    if (!jumlah || jumlah <= 0) return { error: 'Jumlah tidak valid' }
+    const { error } = await sb()
+      .from('cashbook')
+      .update({
+        tipe:       fd.get('tipe') as string,
+        jumlah,
+        keterangan: fd.get('keterangan') as string,
+        kategori:   fd.get('kategori') as string || 'lain-lain',
+        tanggal:    fd.get('tanggal') as string,
+      })
+      .eq('id', id)
+    if (error) return { error: error.message }
+    revalidatePath('/kas')
+    revalidatePath('/dashboard')
+    return { ok: true }
+  } catch (e: any) { return { error: e.message } }
+}
+
 
 // ─── TAGIHAN ─────────────────────────────────────────────────
 export async function buatTagihan(fd: FormData) {
