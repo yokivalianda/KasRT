@@ -2,7 +2,7 @@ import { getNeighborhood, getSaldo, getCashbook, getBills } from '@/lib/db'
 import BottomNav from '@/components/layout/BottomNav'
 import Link from 'next/link'
 import { rpCompact, rp, tglPendek, persen } from '@/lib/utils'
-import { TrendingUp, TrendingDown, ChevronRight, Plus } from 'lucide-react'
+import { TrendingUp, TrendingDown, ChevronRight, Plus, Settings } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 
 export default async function DashboardPage() {
@@ -23,7 +23,18 @@ export default async function DashboardPage() {
           </p>
           <LogoutButton />
         </div>
-        <h1 style={{ fontSize:20, fontWeight:700, margin:'4px 0 16px' }}>Dashboard RT</h1>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', margin:'4px 0 16px' }}>
+          <h1 style={{ fontSize:20, fontWeight:700, margin:0 }}>Dashboard RT</h1>
+          <Link href="/settings" style={{
+            display:'flex', alignItems:'center', gap:4,
+            color:'rgba(255,255,255,0.85)', textDecoration:'none',
+            fontSize:12, fontWeight:600,
+            background:'rgba(255,255,255,0.15)', padding:'5px 10px',
+            borderRadius:99,
+          }}>
+            <Settings size={13} /> Setelan
+          </Link>
+        </div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
           {[
             { label:'Saldo kas',    val: rpCompact(saldo.saldo) },
