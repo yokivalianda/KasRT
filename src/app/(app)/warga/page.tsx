@@ -3,7 +3,7 @@ import { createServer } from '@/lib/supabase/server'
 import BottomNav from '@/components/layout/BottomNav'
 import Link from 'next/link'
 import { inisial, avatarColor, rp, persen, tglPendek } from '@/lib/utils'
-import { UserPlus, Plus, ChevronRight } from 'lucide-react'
+import { UserPlus, Plus, ChevronRight, History } from 'lucide-react'
 
 export default async function WargaPage() {
   const nb = await getNeighborhood()
@@ -66,7 +66,7 @@ export default async function WargaPage() {
         )}
 
         {/* Tombol aksi */}
-        <div style={{ display:'flex', gap:8, marginBottom:14 }}>
+        <div style={{ display:'flex', gap:8, marginBottom:8 }}>
           <Link href="/warga/tambah" className="btn" style={{
             flex:1, textDecoration:'none', display:'flex',
             alignItems:'center', justifyContent:'center', gap:5,
@@ -80,6 +80,15 @@ export default async function WargaPage() {
             <Plus size={14} /> Buat tagihan
           </Link>
         </div>
+        <Link href="/warga/tagihan" style={{
+          display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+          width:'100%', padding:'9px 0', marginBottom:14,
+          fontSize:13, fontWeight:600, color:'var(--text2)',
+          border:'1px solid var(--border)', borderRadius:99,
+          textDecoration:'none', background:'none', transition:'all .15s',
+        }}>
+          <History size={14} /> Lihat riwayat semua tagihan
+        </Link>
 
         {/* Daftar warga */}
         <p style={{ fontSize:11, fontWeight:700, color:'var(--text3)', textTransform:'uppercase', letterSpacing:'.05em', margin:'0 0 8px' }}>
