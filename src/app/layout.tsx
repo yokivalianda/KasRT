@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import SessionRefresher from '@/components/SessionRefresher'
 
 export const metadata: Metadata = {
   title: 'KasRT',
@@ -9,7 +10,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
-      <body>{children}</body>
+      <body>
+        <SessionRefresher />
+        {children}
+      </body>
     </html>
   )
 }
