@@ -2,7 +2,7 @@ import { getNeighborhood, getSaldo, getCashbook } from '@/lib/db'
 import BottomNav from '@/components/layout/BottomNav'
 import Link from 'next/link'
 import { rpCompact, tglPendek } from '@/lib/utils'
-import { TrendingUp, TrendingDown, Wallet, Plus, ChevronRight } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, Plus, ChevronRight, FileText } from 'lucide-react'
 
 const KAT_BG: Record<string,string>   = { iuran:'#ecfdf5', arisan:'#f3e8ff', belanja:'#fff7ed', infra:'#eff6ff', sumbangan:'#f0fdf4', kegiatan:'#fff0f9', operasional:'#f0f9ff', 'lain-lain':'#f5f5f5' }
 const KAT_TEXT: Record<string,string> = { iuran:'#065f46', arisan:'#6b21a8', belanja:'#9a3412', infra:'#1e40af', sumbangan:'#14532d', kegiatan:'#9d174d', operasional:'#0369a1', 'lain-lain':'#555' }
@@ -53,9 +53,14 @@ export default async function KasPage() {
       </div>
 
       <div style={{ padding:'16px 16px 0' }}>
-        <Link href="/kas/tambah" className="btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, width:'100%', textDecoration:'none', marginBottom:14 }}>
-          <Plus size={15} /> Catat transaksi baru
-        </Link>
+        <div style={{ display:'flex', gap:8, marginBottom:14 }}>
+          <Link href="/kas/tambah" className="btn" style={{ flex:2, display:'flex', alignItems:'center', justifyContent:'center', gap:6, textDecoration:'none' }}>
+            <Plus size={15} /> Catat transaksi
+          </Link>
+          <Link href="/kas/laporan" className="btn-outline" style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, textDecoration:'none' }}>
+            <FileText size={14} /> Laporan
+          </Link>
+        </div>
 
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
           <p style={{ fontSize:11, fontWeight:700, color:'var(--text3)', textTransform:'uppercase', letterSpacing:'.05em', margin:0 }}>Semua transaksi</p>
