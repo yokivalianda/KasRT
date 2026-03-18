@@ -4,6 +4,7 @@ import BottomNav from '@/components/layout/BottomNav'
 import LogoutButton from '@/components/LogoutButton'
 import KodeUndangCard from './KodeUndangCard'
 import EditRTForm from './EditRTForm'
+import IOSInstallGuide from './IOSInstallGuide'
 import { Users, RefreshCw, BookOpen, Megaphone } from 'lucide-react'
 
 export default async function SettingsPage() {
