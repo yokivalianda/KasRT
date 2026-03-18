@@ -1,4 +1,4 @@
-import { getNeighborhood, getSaldo, getCashbook, getBills } from '@/lib/db'
+import { getNeighborhood, getSaldo, getCashbook, getBills, getArisanGroups } from '@/lib/db'
 import { createServer } from '@/lib/supabase/server'
 import BottomNav from '@/components/layout/BottomNav'
 import Link from 'next/link'
@@ -7,31 +7,70 @@ import { TrendingUp, TrendingDown, ChevronRight, Plus, Settings } from 'lucide-r
 import LogoutButton from '@/components/LogoutButton'
 import GrafikKas from './GrafikKas'
 import StatistikRT from './StatistikRT'
+import NotifikasiBell from '@/components/NotifikasiBell'
+import { generateNotifs } from '@/lib/notifikasi'
 
 const BULAN_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des']
 
 export default async function DashboardPage() {
   const nb    = await getNeighborhood()
   if (!nb) return null
-  const saldo = await getSaldo(nb.id)
-  const txns  = await getCashbook(nb.id, 4)
-  const bills = await getBills(nb.id)
+  const saldo  = await getSaldo(nb.id)
+  const txns   = await getCashbook(nb.id, 4)
+  const bills  = await getBills(nb.id)
   const tagihan = bills.filter(b => b.status === 'buka')
+  const arisanGroups = await getArisanGroups(nb.id)
 
-  // Ambil data 6 bulan terakhir untuk grafik
   const sb = createServer()
+
+  // Data arisan untuk notifikasi
+  const arisanNotifData = await Promise.all(
+    arisanGroups
+      .filter(g => g.status === 'aktif')
+      .map(async g => {
+        const { data: payments } = await sb
+          .from('arisan_payments')
+          .select('status, member_id')
+          .eq('group_id', g.id)
+          .eq('putaran', g.putaran_ini)
+
+        const belum = (payments ?? []).filter(p => p.status === 'belum').length
+        const total = (payments ?? []).length
+
+        return {
+          id: g.id,
+          nama: g.nama,
+          putaran_ini: g.putaran_ini,
+          belum_bayar: belum,
+          total_anggota: total,
+        }
+      })
+  )
+
+  // Generate notifikasi
+  const notifs = generateNotifs(
+    tagihan.map(b => ({
+      id:          b.id,
+      judul:       b.judul,
+      jatuh_tempo: b.jatuh_tempo,
+      belum_lunas: b.belum_lunas,
+      total_warga: b.total_warga,
+      status:      b.status,
+    })),
+    arisanNotifData,
+  )
+
+  // Data grafik 6 bulan
   const { data: txnsBulanan } = await sb
     .from('cashbook')
     .select('tanggal, tipe, jumlah')
     .eq('neighborhood_id', nb.id)
     .gte('tanggal', (() => {
-      const d = new Date()
-      d.setMonth(d.getMonth() - 5)
+      const d = new Date(); d.setMonth(d.getMonth() - 5)
       return d.toISOString().slice(0, 7) + '-01'
     })())
     .order('tanggal')
 
-  // Hitung jumlah warga aktif
   const { count: jmlWarga } = await sb
     .from('members')
     .select('id', { count: 'exact', head: true })
@@ -48,48 +87,39 @@ export default async function DashboardPage() {
     else curr.keluar += t.jumlah
   })
 
-  // Isi 6 bulan terakhir (termasuk yang kosong)
   const grafikData = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date()
-    d.setMonth(d.getMonth() - (5 - i))
+    const d = new Date(); d.setMonth(d.getMonth() - (5 - i))
     const key = d.toISOString().slice(0, 7)
     const val = bulanMap.get(key) ?? { masuk: 0, keluar: 0 }
-    return {
-      bulan: key,
-      label: BULAN_ID[d.getMonth()],
-      masuk:  val.masuk,
-      keluar: val.keluar,
-      saldo:  val.masuk - val.keluar,
-    }
+    return { bulan: key, label: BULAN_ID[d.getMonth()], masuk: val.masuk, keluar: val.keluar, saldo: val.masuk - val.keluar }
   })
 
-  // Statistik bulan ini vs bulan lalu
   const bulanIni  = new Date().toISOString().slice(0, 7)
-  const bulanLalu = (() => {
-    const d = new Date()
-    d.setMonth(d.getMonth() - 1)
-    return d.toISOString().slice(0, 7)
-  })()
-
-  const dataIni  = bulanMap.get(bulanIni)  ?? { masuk: 0, keluar: 0 }
-  const dataLalu = bulanMap.get(bulanLalu) ?? { masuk: 0, keluar: 0 }
+  const bulanLalu = (() => { const d = new Date(); d.setMonth(d.getMonth()-1); return d.toISOString().slice(0,7) })()
+  const dataIni   = bulanMap.get(bulanIni)  ?? { masuk: 0, keluar: 0 }
+  const dataLalu  = bulanMap.get(bulanLalu) ?? { masuk: 0, keluar: 0 }
 
   return (
     <div className="page">
       {/* Header */}
       <div style={{ background:'var(--teal)', padding:'48px 20px 20px', color:'#fff' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
           <p style={{ fontSize:12, opacity:.75, margin:0 }}>
             {nb.nama}{nb.rw ? ` / ${nb.rw}` : ''}{nb.kelurahan ? ` · ${nb.kelurahan}` : ''}
           </p>
-          <LogoutButton />
+          <div style={{ display:'flex', gap:8 }}>
+            <NotifikasiBell notifs={notifs} />
+            <LogoutButton />
+          </div>
         </div>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', margin:'4px 0 16px' }}>
+
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', margin:'6px 0 16px' }}>
           <h1 style={{ fontSize:20, fontWeight:700, margin:0 }}>Dashboard RT</h1>
           <Link href="/settings" style={{ display:'flex', alignItems:'center', gap:4, color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:12, fontWeight:600, background:'rgba(255,255,255,0.15)', padding:'5px 10px', borderRadius:99 }}>
             <Settings size={13} /> Setelan
           </Link>
         </div>
+
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
           {[
             { label:'Saldo kas',   val: rpCompact(saldo.saldo) },
@@ -118,8 +148,8 @@ export default async function DashboardPage() {
           jmlTagihanAktif={tagihan.length}
         />
 
-        {/* Grafik 6 bulan */}
-        <div style={{ marginBottom: 16 }}>
+        {/* Grafik */}
+        <div style={{ marginBottom:16 }}>
           <GrafikKas data={grafikData} />
         </div>
 
