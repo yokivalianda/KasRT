@@ -2,6 +2,17 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Helper functions (harus di luar GET agar kompatibel dengan semua target TS)
+const escXml = (s: string) =>
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+
+const cellType = (val: unknown) =>
+  typeof val === 'number' ? '' : ' t="s"'
+
 export async function GET(req: NextRequest) {
   const sb = createRouteHandlerClient({ cookies })
   const { data: { session } } = await sb.auth.getSession()
@@ -154,18 +165,6 @@ export async function GET(req: NextRequest) {
     // ── Generate Excel (XLSX via XML) ─────────────────────────
     // Pakai format SpreadsheetML — native Excel tanpa library
     const headers = Object.keys(rows[0])
-
-    function escXml(s: string) {
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-    }
-
-    function cellType(val: unknown) {
-      return typeof val === 'number' ? '' : ' t="s"'
-    }
 
     // String table
     const strings: string[] = []
