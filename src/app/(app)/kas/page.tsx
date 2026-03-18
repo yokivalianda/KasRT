@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { rpCompact } from '@/lib/utils'
 import { TrendingUp, TrendingDown, Wallet, Plus, FileText } from 'lucide-react'
 import KasList from './KasList'
+import ExportButton from '@/components/ExportButton'
 
 export default async function KasPage() {
   const nb    = await getNeighborhood()
@@ -64,6 +65,7 @@ export default async function KasPage() {
           <Link href="/kas/laporan" className="btn-outline" style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, textDecoration:'none' }}>
             <FileText size={14} /> Laporan
           </Link>
+          <ExportButton tipe="kas" label="Export" />
         </div>
 
         {/* List dengan search + filter */}

@@ -6,6 +6,7 @@ import KodeUndangCard from './KodeUndangCard'
 import EditRTForm from './EditRTForm'
 import IOSInstallGuide from './IOSInstallGuide'
 import ThemeToggle from '@/components/ThemeToggle'
+import ExportButton from '@/components/ExportButton'
 import { Users, RefreshCw, BookOpen, Megaphone } from 'lucide-react'
 
 export default async function SettingsPage() {
@@ -68,6 +69,31 @@ export default async function SettingsPage() {
           <KodeUndangCard kode={nb.kode_undang} nama={nb.nama} />
           <p style={{ fontSize:12, color:'var(--text3)', margin:'8px 0 0', lineHeight:1.6 }}>
             Bagikan kode ini agar warga bisa bergabung ke RT Anda. Kode bersifat unik dan permanen.
+          </p>
+        </div>
+
+        {/* Export data */}
+        <div className="card" style={{ padding:16, marginBottom:12 }}>
+          <p style={{ fontSize:11, fontWeight:700, color:'var(--text3)', textTransform:'uppercase', letterSpacing:'.05em', margin:'0 0 12px' }}>
+            Export Data
+          </p>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {[
+              { tipe:'warga'   as const, label:'Data Warga',        desc:'Nama, nomor rumah, HP, status iuran' },
+              { tipe:'kas'     as const, label:'Buku Kas',           desc:'Semua transaksi pemasukan & pengeluaran' },
+              { tipe:'tagihan' as const, label:'Rekap Tagihan',      desc:'Status bayar iuran per warga' },
+            ].map(({ tipe, label, desc }) => (
+              <div key={tipe} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom:'1px solid var(--border)' }}>
+                <div>
+                  <p style={{ fontSize:13, fontWeight:600, color:'var(--text)', margin:'0 0 2px' }}>{label}</p>
+                  <p style={{ fontSize:11, color:'var(--text3)', margin:0 }}>{desc}</p>
+                </div>
+                <ExportButton tipe={tipe} variant="minimal" label="Export" />
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize:11, color:'var(--text3)', margin:'10px 0 0', lineHeight:1.6 }}>
+            Tersedia dalam format Excel (.xlsx) dan CSV. Data sesuai kondisi terkini.
           </p>
         </div>
 

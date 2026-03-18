@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { rp, persen, tglPendek } from '@/lib/utils'
 import { UserPlus, Plus, ChevronRight, History } from 'lucide-react'
 import WargaList from './WargaList'
+import ExportButton from '@/components/ExportButton'
 
 export default async function WargaPage() {
   const nb = await getNeighborhood()
@@ -75,9 +76,12 @@ export default async function WargaPage() {
           </Link>
         </div>
 
-        <Link href="/warga/tagihan" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, width:'100%', padding:'9px 0', marginBottom:14, fontSize:13, fontWeight:600, color:'var(--text2)', border:'1px solid var(--border)', borderRadius:99, textDecoration:'none' }}>
-          <History size={14} /> Lihat riwayat semua tagihan
-        </Link>
+        <div style={{ display:'flex', gap:8, marginBottom:14 }}>
+          <Link href="/warga/tagihan" style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'9px 14px', fontSize:13, fontWeight:600, color:'var(--text2)', border:'1px solid var(--border)', borderRadius:99, textDecoration:'none' }}>
+            <History size={14} /> Riwayat tagihan
+          </Link>
+          <ExportButton tipe="warga" label="Export" variant="outline" />
+        </div>
 
         {/* Daftar warga dengan search + filter */}
         <p style={{ fontSize:11, fontWeight:700, color:'var(--text3)', textTransform:'uppercase', letterSpacing:'.05em', margin:'0 0 8px' }}>
