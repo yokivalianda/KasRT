@@ -269,7 +269,7 @@ ${strings.map(s => `<si><t xml:space="preserve">${escXml(s)}</t></si>`).join('')
 
     const zipBytes = buildZip(files)
 
-    return new NextResponse(zipBytes, {
+    return new NextResponse(Buffer.from(zipBytes), {
       headers: {
         'Content-Type':        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': `attachment; filename="${filename}.xlsx"`,
