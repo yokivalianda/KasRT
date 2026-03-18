@@ -8,6 +8,7 @@ import LogoutButton from '@/components/LogoutButton'
 import GrafikKas from './GrafikKas'
 import StatistikRT from './StatistikRT'
 import NotifikasiBell from '@/components/NotifikasiBell'
+import ThemeToggle from '@/components/ThemeToggle'
 import { generateNotifs } from '@/lib/notifikasi'
 
 const BULAN_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des']
@@ -109,6 +110,7 @@ export default async function DashboardPage() {
           </p>
           <div style={{ display:'flex', gap:8 }}>
             <NotifikasiBell notifs={notifs} />
+            <ThemeToggle variant="icon" />
             <LogoutButton />
           </div>
         </div>

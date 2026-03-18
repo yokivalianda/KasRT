@@ -5,6 +5,7 @@ import LogoutButton from '@/components/LogoutButton'
 import KodeUndangCard from './KodeUndangCard'
 import EditRTForm from './EditRTForm'
 import IOSInstallGuide from './IOSInstallGuide'
+import ThemeToggle from '@/components/ThemeToggle'
 import { Users, RefreshCw, BookOpen, Megaphone } from 'lucide-react'
 
 export default async function SettingsPage() {
@@ -68,6 +69,15 @@ export default async function SettingsPage() {
           <p style={{ fontSize:12, color:'var(--text3)', margin:'8px 0 0', lineHeight:1.6 }}>
             Bagikan kode ini agar warga bisa bergabung ke RT Anda. Kode bersifat unik dan permanen.
           </p>
+        </div>
+
+        {/* Tampilan */}
+        <div className="card" style={{ padding:16, marginBottom:12 }}>
+          <p style={{ fontSize:11, fontWeight:700, color:'var(--text3)', textTransform:'uppercase', letterSpacing:'.05em', margin:'0 0 12px' }}>
+            Tampilan
+          </p>
+          <p style={{ fontSize:13, fontWeight:500, color:'var(--text2)', margin:'0 0 8px' }}>Mode warna</p>
+          <ThemeToggle variant="full" />
         </div>
 
         {/* Akun */}

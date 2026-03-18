@@ -29,15 +29,15 @@ export default function NotifikasiBell({ notifs }: Props) {
   const belumDibaca = notifs.filter(n => !dibaca.has(n.id)).length
 
   function tandaiDibaca(id: string) {
-    const next = new Set([...dibaca, id])
+    const next = new Set(Array.from(dibaca).concat(id))
     setDibaca(next)
-    try { localStorage.setItem('kasrt-notif-read', JSON.stringify([...next])) } catch {}
+    try { localStorage.setItem('kasrt-notif-read', JSON.stringify(Array.from(next))) } catch {}
   }
 
   function tandaiSemuaDibaca() {
-    const next = new Set(notifs.map(n => n.id))
+    const next = new Set<string>(notifs.map(n => n.id))
     setDibaca(next)
-    try { localStorage.setItem('kasrt-notif-read', JSON.stringify([...next])) } catch {}
+    try { localStorage.setItem('kasrt-notif-read', JSON.stringify(Array.from(next))) } catch {}
   }
 
   const TIPE_CONFIG = {
