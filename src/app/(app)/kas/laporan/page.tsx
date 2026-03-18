@@ -54,9 +54,9 @@ export default async function LaporanPage({ searchParams }: Props) {
     .eq('neighborhood_id', nb.id)
     .order('tanggal', { ascending: false })
 
-  const uniqueBulan = [...new Set(
+  const uniqueBulan = Array.from(new Set(
     (bulanTersedia ?? []).map(t => t.tanggal.slice(0, 7))
-  )].slice(0, 24) // Maks 24 bulan terakhir
+  )).slice(0, 24) // Maks 24 bulan terakhir
 
   // Tambahkan bulan ini jika belum ada
   if (!uniqueBulan.includes(bulan)) uniqueBulan.unshift(bulan)
