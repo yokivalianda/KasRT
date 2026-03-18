@@ -1,11 +1,9 @@
 import { getNeighborhood, getSaldo, getCashbook } from '@/lib/db'
 import BottomNav from '@/components/layout/BottomNav'
 import Link from 'next/link'
-import { rpCompact, tglPendek } from '@/lib/utils'
-import { TrendingUp, TrendingDown, Wallet, Plus, ChevronRight, FileText } from 'lucide-react'
-
-const KAT_BG: Record<string,string>   = { iuran:'#ecfdf5', arisan:'#f3e8ff', belanja:'#fff7ed', infra:'#eff6ff', sumbangan:'#f0fdf4', kegiatan:'#fff0f9', operasional:'#f0f9ff', 'lain-lain':'#f5f5f5' }
-const KAT_TEXT: Record<string,string> = { iuran:'#065f46', arisan:'#6b21a8', belanja:'#9a3412', infra:'#1e40af', sumbangan:'#14532d', kegiatan:'#9d174d', operasional:'#0369a1', 'lain-lain':'#555' }
+import { rpCompact } from '@/lib/utils'
+import { TrendingUp, TrendingDown, Wallet, Plus, FileText } from 'lucide-react'
+import KasList from './KasList'
 
 export default async function KasPage() {
   const nb    = await getNeighborhood()
@@ -20,9 +18,12 @@ export default async function KasPage() {
 
   return (
     <div className="page">
+      {/* Header */}
       <div style={{ background:'var(--teal)', padding:'48px 20px 20px', color:'#fff' }}>
         <p style={{ fontSize:12, opacity:.75, margin:'0 0 3px' }}>Buku Kas RT</p>
         <h1 style={{ fontSize:20, fontWeight:700, margin:'0 0 14px' }}>{nb.nama}</h1>
+
+        {/* Saldo utama */}
         <div style={{ background:'rgba(255,255,255,.18)', borderRadius:12, padding:'14px 16px', marginBottom:10 }}>
           <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:4, opacity:.8 }}>
             <Wallet size={14} /><span style={{ fontSize:12 }}>Total saldo</span>
@@ -39,6 +40,8 @@ export default async function KasPage() {
             </div>
           </div>
         </div>
+
+        {/* Bulan ini */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
           {[
             { label:'Masuk bulan ini',  val: masukBulanIni },
@@ -53,6 +56,7 @@ export default async function KasPage() {
       </div>
 
       <div style={{ padding:'16px 16px 0' }}>
+        {/* Tombol aksi */}
         <div style={{ display:'flex', gap:8, marginBottom:14 }}>
           <Link href="/kas/tambah" className="btn" style={{ flex:2, display:'flex', alignItems:'center', justifyContent:'center', gap:6, textDecoration:'none' }}>
             <Plus size={15} /> Catat transaksi
@@ -62,11 +66,7 @@ export default async function KasPage() {
           </Link>
         </div>
 
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
-          <p style={{ fontSize:11, fontWeight:700, color:'var(--text3)', textTransform:'uppercase', letterSpacing:'.05em', margin:0 }}>Semua transaksi</p>
-          <span style={{ fontSize:11, color:'var(--text3)' }}>{txns.length} entri · ketuk untuk edit</span>
-        </div>
-
+        {/* List dengan search + filter */}
         {txns.length === 0 ? (
           <div className="card" style={{ padding:28, textAlign:'center' }}>
             <p style={{ fontSize:14, color:'var(--text3)', margin:'0 0 4px', fontWeight:600 }}>Belum ada transaksi</p>
@@ -76,35 +76,7 @@ export default async function KasPage() {
             </Link>
           </div>
         ) : (
-          <div className="card">
-            {txns.map((e, i) => (
-              <Link key={e.id} href={`/kas/${e.id}`} style={{ textDecoration:'none', color:'inherit', display:'block' }}>
-                <div className="list-row" style={{
-                  display:'flex', alignItems:'center', gap:12, padding:'11px 14px',
-                  borderBottom: i < txns.length-1 ? '1px solid var(--border)' : 'none',
-                }}>
-                  <div style={{ width:34, height:34, borderRadius:9, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', background: e.tipe==='masuk'?'#ecfdf5':'#fef2f2' }}>
-                    {e.tipe==='masuk' ? <TrendingUp size={15} color="#16a34a" /> : <TrendingDown size={15} color="#dc2626" />}
-                  </div>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <p style={{ fontSize:13, fontWeight:500, margin:'0 0 3px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{e.keterangan}</p>
-                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                      <span style={{ fontSize:11, color:'var(--text3)' }}>{tglPendek(e.tanggal)}</span>
-                      <span style={{ fontSize:10, fontWeight:600, padding:'1px 6px', borderRadius:99, background:KAT_BG[e.kategori]??'#f5f5f5', color:KAT_TEXT[e.kategori]??'#555' }}>
-                        {e.kategori}
-                      </span>
-                    </div>
-                  </div>
-                  <div style={{ display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
-                    <p style={{ fontSize:13, fontWeight:700, margin:0, color:e.tipe==='masuk'?'#16a34a':'#dc2626' }}>
-                      {e.tipe==='masuk'?'+':'−'}{e.jumlah.toLocaleString('id-ID')}
-                    </p>
-                    <ChevronRight size={14} color="var(--text3)" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <KasList txns={txns} />
         )}
       </div>
       <BottomNav />
